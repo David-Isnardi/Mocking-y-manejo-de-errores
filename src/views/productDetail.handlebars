@@ -1,0 +1,68 @@
+<h2>Producto</h2>
+    <hr />
+    <table>
+        <thead>
+            <tr>
+                <td>Producto</td>
+                <td>Descripción</td>
+                <td>Precio</td>
+                <td>Código</td>
+                <td>Stock</td>
+                <td>Categoria</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{this.title}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.price}}</td>
+                <td>{{this.code}}</td>
+                <td>{{this.stock}}</td>
+                <td>{{this.category}}</td>
+                {{_id}}
+                <td>                 
+                   <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+const addToCart = async (id) => {
+    // Crear el carrito si no existe en el almacenamiento local
+    let cart = JSON.parse(localStorage.getItem('cart'));
+    if (!cart) {
+        // Si el carrito no existe, crear uno nuevo a través de una solicitud POST a la API
+        const response = await fetch(`/api/carritos`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Analizar el JSON de la respuesta para obtener la información del nuevo carrito
+        const nuevoCarrito = await response.json();
+        cart = nuevoCarrito;
+
+        // Almacenar el nuevo carrito en el almacenamiento local
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    // Agregar el producto seleccionado al carrito mediante una solicitud POST a la API
+    const respuesta = await fetch(`/api/carritos/${cart._id}/producto/${id}`, {
+        method: 'POST'
+    });
+
+    // Verificar si la solicitud fue exitosa
+    if (!respuesta.ok) {
+        console.log('error');
+    }
+
+    // Mostrar una alerta indicando que el producto se ha agregado al carrito
+    alert('Agregado al carrito');
+    console.log(await respuesta.json());
+}
+
+</script>
